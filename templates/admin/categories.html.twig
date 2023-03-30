@@ -1,0 +1,28 @@
+{% extends 'admin/base_admin.html.twig' %}
+    {% block customstylesheets %}
+        <style>
+            .fa-ul>li {
+                margin-top: 15px;
+            }
+        </style>
+    {% endblock %}
+
+{% block main %}
+    <h2>Categories list</h2>
+        {{ categoriesList|raw }}
+    {{ form_start(form, {'attr': {'novalidate':'novalidate'}}) }}
+        <div class="col-md-4 mb-3">
+            <label for="validationServer01">Add new category</label>
+                {{ form_widget(form.name, {'attr': {'class': 'form-control ' ~ is_invalid, 'placeholder':"Category name" }, 'id':'validationServer01'}) }}
+            <br>
+            <label for="inlineFormCustomSelect">Parent:</label>
+            <select class="custom-select mr-sm-2" id="inlineFormCustomSelect" name="category[parent]">
+                {{ render(controller('App\\Controller\\AdminController::getAllCategories')) }}
+            </select>
+            <div class="invalid-feedback">
+               {{ form_errors(form.name) }}
+            </div>
+            <button class="btn btn-primary mt-3" type="submit">Add</button>
+        </div>
+    {{ form_end(form) }}
+{% endblock %}

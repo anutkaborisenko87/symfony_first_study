@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="{{ asset('assets/css/styles.css') }}">
+
+    <!-- Custom styles for this template -->
+
+
+    <link rel="stylesheet" href="{{ asset('assets/css/fontawesome.min.css') }}">
+    {% block customstylesheets %}
+        <link href="{{ asset('assets/css/dashboard.css') }}" rel="stylesheet">
+    {% endblock %}
+    <title>{% block title %}Awesome videos - admin panel{% endblock %}</title>
+</head>
+
+<body class="text-center">
+<div class="container-fluid">
+
+    <div class="d-flex flex-column flex-md-row align-items-center p-3 px-md-4 mb-3 bg-white border-bottom shadow-sm">
+        <h5 class="my-0 mr-md-auto font-weight-normal">Awesome Videos</h5>
+        <a class="nav-link active" href="{{ path('main_page') }}"> Go to public site</a>
+        <nav class="my-2 my-md-0 mr-md-3">
+            <a class="p-2 text-dark">Logged as John Smith</a>
+        </nav>
+        <a class="btn btn-outline-primary" href="#">Logout</a>
+    </div>
+
+    <div class="row">
+        <nav class="col-md-2 d-none d-md-block bg-light sidebar">
+            <div class="sidebar-sticky">
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ path('main_admin_page') }}">
+                            <span data-feather="file"></span>
+                            My profile
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ path('categories_admin_page') }}">
+                            <span data-feather="file"></span>
+                            Categories
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ path('videos_admin_page') }}">
+                            <span data-feather="shopping-cart"></span>
+                            Videos
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ path('upload_video_admin_page') }}">
+                            <span data-feather="shopping-cart"></span>
+                            Upload a video
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ path('users_admin_page') }}">
+                            <span data-feather="users"></span>
+                            Users
+                        </a>
+                    </li>
+                </ul>
+
+            </div>
+        </nav>
+
+        <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                <h1 class="h2"><a href="{{ path('main_admin_page') }}">Dashboard</a></h1>
+            </div>
+            {% block main %}
+            {% endblock %}
+        </main>
+    </div>
+</div>
+
+<!-- Optional JavaScript -->
+<!-- jQuery first, then Popper.js, then Bootstrap JS -->
+<script src="{{ asset('assets/js/jquery.js') }}"></script>
+<script src="{{ asset('assets/js/popper.js') }}"></script>
+<script src="{{ asset('assets/js/bootstrap.js') }}"></script>
+
+{% block customjavascripts %}
+    <script>
+        $('input[type="file"]').change(function (e) {
+            var fileName = e.target.files[0].name;
+            console.log(e.target.files[0]);
+            $('.custom-file-label').html(fileName);
+        });
+    </script>
+{% endblock %}
+</body>
+
+</html>
