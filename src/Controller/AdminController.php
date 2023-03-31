@@ -29,7 +29,7 @@ class AdminController extends AbstractController
     }
 
     /**
-     * @Route("/categories", name="categories_admin_page", methods={"GET", "POST"})
+     * @Route("/su/categories", name="categories_admin_page", methods={"GET", "POST"})
      */
     public function categories(CategoryTreeAdminList $categories,
                                Request $request,
@@ -52,7 +52,7 @@ class AdminController extends AbstractController
     }
 
     /**
-     * @Route("/edit_category/{id}", name="edit_category_admin_page", methods={"GET", "POST"})
+     * @Route("/su/edit_category/{id}", name="edit_category_admin_page", methods={"GET", "POST"})
      */
     public function editCategory(Category $category,
                                  Request $request,
@@ -72,7 +72,7 @@ class AdminController extends AbstractController
     }
 
     /**
-     * @Route("/delete_category/{id}", name="delete_category_admin_page")
+     * @Route("/su/delete_category/{id}", name="delete_category_admin_page")
      */
     public function deleteCategory(Category $category, EntityManagerInterface $entityManager): RedirectResponse
     {
@@ -90,7 +90,7 @@ class AdminController extends AbstractController
     }
 
     /**
-     * @Route("/upload-video", name="upload_video_admin_page")
+     * @Route("/su/upload-video", name="upload_video_admin_page")
      */
     public function upload_video(): Response
     {
@@ -98,7 +98,7 @@ class AdminController extends AbstractController
     }
 
     /**
-     * @Route("/users", name="users_admin_page")
+     * @Route("/su/users", name="users_admin_page")
      */
     public function users(): Response
     {
@@ -107,12 +107,14 @@ class AdminController extends AbstractController
 
     public function getAllCategories(CategoryTreeAdminOptionList $categories, $editedCategory = null): Response
     {
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
         $categories->getCategoryList($categories->buildTree());
         return $this->render('admin/_all_categories.html.twig', compact('categories', 'editedCategory'));
     }
 
     private function saveCategory($form, $request, $category, $entityManager): bool
     {
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
             $category->setName($request->request->get('category')['name']);
