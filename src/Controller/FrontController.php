@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Category;
+use App\Entity\Video;
 use App\Utils\CategoryTreeFrontPage;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -20,12 +21,15 @@ class FrontController extends AbstractController
     }
 
     /**
-     * @Route ("/video-list/category/{categoryname}_{id}", name="video_list")
+     * @Route ("/video-list/category/{categoryname}_{id}/{page}", defaults={"page": "1"}, name="video_list")
      */
-    public function videoList(Category $category, CategoryTreeFrontPage $categories): Response
+    public function videoList(Category $category, int $page,
+                              CategoryTreeFrontPage $categories,
+                              EntityManagerInterface $entityManager): Response
     {
         $categories->getCategoryListAndParent($category->getId());
-        return $this->render('front/video_list.html.twig', compact('categories'));
+        $videos = $entityManager->getRepository(Video::class)->findAllPaginated($page);
+        return $this->render('front/video_list.html.twig', compact('categories', 'videos'));
     }
 
     /**
@@ -78,7 +82,7 @@ class FrontController extends AbstractController
 
     public function mainCategories(EntityManagerInterface $entityManager): Response
     {
-        $categories = $entityManager->getRepository(Category::class)->findBy(["parent"=>null], ["name" => 'ASC']);
+        $categories = $entityManager->getRepository(Category::class)->findBy(["parent" => null], ["name" => 'ASC']);
         return $this->render('front/_main_categories.html.twig', compact('categories'));
     }
 
