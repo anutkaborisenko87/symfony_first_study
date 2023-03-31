@@ -27,8 +27,10 @@ class FrontController extends AbstractController
                               CategoryTreeFrontPage $categories,
                               EntityManagerInterface $entityManager): Response
     {
+        $ids = $categories->getChildIds($category->getId());
+        array_push($ids, $category->getId());
+        $videos = $entityManager->getRepository(Video::class)->findByChildIds($ids, $page);
         $categories->getCategoryListAndParent($category->getId());
-        $videos = $entityManager->getRepository(Video::class)->findAllPaginated($page);
         return $this->render('front/video_list.html.twig', compact('categories', 'videos'));
     }
 

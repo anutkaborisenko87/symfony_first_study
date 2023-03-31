@@ -110,4 +110,19 @@ class CategoryTreeFrontPage extends CategoryTreeAbstractClass
         $categories_array = $this->buildTree($parentData['id']);
         return $this->getCategoryList($categories_array);
     }
+
+    public function getChildIds(int $parent): array
+    {
+        static $ids = [];
+        foreach($this->categotiesArrayFromDb as $val)
+        {
+            if($val['parent_id'] == $parent)
+            {
+                $ids[] = $val['id'].',';
+                $this->getChildIds($val['id']);
+            }
+        }
+
+        return $ids;
+    }
 }
