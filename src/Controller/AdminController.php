@@ -12,12 +12,25 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Core\Security;
 
 /**
  * @Route ("/admin")
  */
 class AdminController extends AbstractController
 {
+    /**
+     * @var Security
+     */
+    private $security;
+
+    public function __construct(Security $security)
+    {
+        if (!$security->isGranted('IS_AUTHENTICATED_FULLY')) {
+            return $this->redirectToRoute('login');
+        }
+        $this->security = $security;
+    }
     /**
      * @Route("/", name="main_admin_page")
      */
@@ -76,6 +89,9 @@ class AdminController extends AbstractController
      */
     public function deleteCategory(Category $category, EntityManagerInterface $entityManager): RedirectResponse
     {
+        if (!$this->security->isGranted('IS_AUTHENTICATED_FULLY') && !$this->security->isGranted('ROLE_ADMIN')) {
+            return $this->redirectToRoute('login');
+        }
         $entityManager->remove($category);
         $entityManager->flush();
         return $this->redirectToRoute('categories_admin_page');
