@@ -111,7 +111,7 @@ class Video
         return $this;
     }
 
-    public function vimeoid($user)
+    public function vimeoid($user): string
     {
         if ($user) {
             return $this->path;

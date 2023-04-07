@@ -167,4 +167,67 @@ class FrontController extends AbstractController
         return $this->redirectToRoute('video_details', ['video'=>$video->getId()]);
     }
 
+    /**
+     * @Route ("/video-list/{video}/like", name="like_video", methods={"POST"})
+     * @Route ("/video-list/{video}/dislike", name="dislike_video", methods={"POST"})
+     * @Route ("/video-list/{video}/unlike", name="undo_like_video", methods={"POST"})
+     * @Route ("/video-list/{video}/undo_dislike", name="undo_dislike_video", methods={"POST"})
+     */
+
+    public function toggleLikesAjax(Video $video, Request $request, EntityManagerInterface $entityManager)
+    {
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+        switch ($request->get('_route')) {
+            case 'like_video':
+                $result = $this->likeVideo($video, $entityManager);
+                break;
+            case 'dislike_video':
+                $result = $this->dislikeVideo($video, $entityManager);
+                break;
+            case 'undo_like_video':
+                $result = $this->unlikeVideo($video, $entityManager);
+                break;
+            case 'undo_dislike_video':
+                $result = $this->undodislikeVideo($video, $entityManager);
+                break;
+        }
+        return $this->json(['action' => $result, 'id'=>$video->getId()]);
+    }
+
+    private function likeVideo(Video $video, EntityManagerInterface $entityManager): string
+    {
+        $user = $entityManager->getRepository(User::class)->find($this->getUser());
+        $user->addLikedVideo($video);
+        $entityManager->persist($user);
+        $entityManager->flush();
+        return 'liked';
+    }
+
+    private function dislikeVideo(Video $video, EntityManagerInterface $entityManager): string
+    {
+        $user = $entityManager->getRepository(User::class)->find($this->getUser());
+        $user->addDisLikeVideo($video);
+        $entityManager->persist($user);
+        $entityManager->flush();
+        return 'disliked';
+    }
+
+    private function unlikeVideo(Video $video, EntityManagerInterface $entityManager): string
+    {
+        $user = $entityManager->getRepository(User::class)->find($this->getUser());
+        $user->removeLikedVideo($video);
+        $entityManager->persist($user);
+        $entityManager->flush();
+        return 'undo liked';
+    }
+
+    private function undodislikeVideo(Video $video, EntityManagerInterface $entityManager): string
+    {
+        $user = $entityManager->getRepository(User::class)->find($this->getUser());
+        $user->removeDisLikeVideo($video);
+        $entityManager->persist($user);
+        $entityManager->flush();
+        return 'undo disliked';
+    }
+
 }
