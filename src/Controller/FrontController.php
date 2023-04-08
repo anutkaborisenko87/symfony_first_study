@@ -2,23 +2,22 @@
 
 namespace App\Controller;
 
+use App\Controller\Traits\Likes;
 use App\Entity\Category;
 use App\Entity\Comment;
-use App\Entity\User;
 use App\Entity\Video;
-use App\Form\UserType;
 use App\Repository\VideoRepository;
 use App\Utils\CategoryTreeFrontPage;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
-use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
-use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 class FrontController extends AbstractController
 {
+    use Likes;
     /**
      * @Route("/", name="main_page")
      */
@@ -78,44 +77,6 @@ class FrontController extends AbstractController
     }
 
     /**
-     * @Route ("/register", name="register")
-     */
-    public function register(Request $request,
-                             EntityManagerInterface $entityManager,
-                             UserPasswordEncoderInterface $password_encoder)
-    {
-        $user = new User();
-        $form = $this->createForm(UserType::class, $user);
-        $form->handleRequest($request);
-        $is_invalid = null;
-        if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->getRepository(User::class);
-            $user->setName($request->request->get('user')['name']);
-            $user->setLastName($request->request->get('user')['last_name']);
-            $user->setEmail($request->request->get('user')['email']);
-            $password = $password_encoder->encodePassword($user, $request->request->get('user')['password']['first']);
-            $user->setPassword($password);
-            $entityManager->persist($user);
-            $entityManager->flush();
-            $this->loginUserAutomatically($user, $password);
-            return $this->redirectToRoute('main_admin_page');
-        } elseif ($request->isMethod('post')) {
-            $is_invalid = 'is-invalid';
-        }
-        $form = $form->createView();
-        return $this->render('front/register.html.twig', compact('form', 'is_invalid'));
-    }
-
-    /**
-     * @Route ("/login", name="login")
-     */
-    public function login(AuthenticationUtils $helper): Response
-    {
-        $error = $helper->getLastAuthenticationError();
-        return $this->render('front/login.html.twig', compact('error'));
-    }
-
-    /**
      * @Route ("/payment", name="payment")
      */
     public function payment(): Response
@@ -128,31 +89,12 @@ class FrontController extends AbstractController
         $categories = $entityManager->getRepository(Category::class)->findBy(["parent" => null], ["name" => 'ASC']);
         return $this->render('front/_main_categories.html.twig', compact('categories'));
     }
-    /**
-     * @Route ("/logout", name="logout")
-     */
-    public function logout()
-    {
-       throw new \Exception('This should never be reached!');
-    }
-
-    private function loginUserAutomatically(User $user, $password)
-    {
-        $token = new UsernamePasswordToken(
-            $user,
-            $password,
-            'main',
-            $user->getRoles()
-        );
-        $this->get('security.token_storage')->setToken($token);
-        $this->get('session')->set('_security_main', serialize($token));
-    }
 
     /**
      * @Route ("/new-comment/{video}", methods={"POST"}, name="new-comment")
      */
 
-    public function newComment(Video $video, Request $request, EntityManagerInterface $entityManager)
+    public function newComment(Video $video, Request $request, EntityManagerInterface $entityManager): RedirectResponse
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
         if (!empty(trim($request->request->get('comment')))) {
@@ -174,7 +116,7 @@ class FrontController extends AbstractController
      * @Route ("/video-list/{video}/undo_dislike", name="undo_dislike_video", methods={"POST"})
      */
 
-    public function toggleLikesAjax(Video $video, Request $request, EntityManagerInterface $entityManager)
+    public function toggleLikesAjax(Video $video, Request $request, EntityManagerInterface $entityManager): JsonResponse
     {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
         switch ($request->get('_route')) {
@@ -194,40 +136,5 @@ class FrontController extends AbstractController
         return $this->json(['action' => $result, 'id'=>$video->getId()]);
     }
 
-    private function likeVideo(Video $video, EntityManagerInterface $entityManager): string
-    {
-        $user = $entityManager->getRepository(User::class)->find($this->getUser());
-        $user->addLikedVideo($video);
-        $entityManager->persist($user);
-        $entityManager->flush();
-        return 'liked';
-    }
-
-    private function dislikeVideo(Video $video, EntityManagerInterface $entityManager): string
-    {
-        $user = $entityManager->getRepository(User::class)->find($this->getUser());
-        $user->addDisLikeVideo($video);
-        $entityManager->persist($user);
-        $entityManager->flush();
-        return 'disliked';
-    }
-
-    private function unlikeVideo(Video $video, EntityManagerInterface $entityManager): string
-    {
-        $user = $entityManager->getRepository(User::class)->find($this->getUser());
-        $user->removeLikedVideo($video);
-        $entityManager->persist($user);
-        $entityManager->flush();
-        return 'undo liked';
-    }
-
-    private function undodislikeVideo(Video $video, EntityManagerInterface $entityManager): string
-    {
-        $user = $entityManager->getRepository(User::class)->find($this->getUser());
-        $user->removeDisLikeVideo($video);
-        $entityManager->persist($user);
-        $entityManager->flush();
-        return 'undo disliked';
-    }
 
 }
