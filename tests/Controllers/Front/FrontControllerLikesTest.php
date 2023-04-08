@@ -107,8 +107,6 @@ class FrontControllerLikesTest extends WebTestCase
         $user = $entityManager->getRepository(User::class)->findOneBy(['email' => 'anna_2user@default.ua']);
         $client->loginUser($user);
         $client->followRedirects();
-        $client->request('POST', '/video-list/12/like');
-        $client->request('POST', '/video-list/12/unlike');
         $client->request('POST', '/video-list/8/unlike');
         $client->request('POST', '/video-list/10/unlike');
         $crawler = $client->request('GET', '/admin/videos');

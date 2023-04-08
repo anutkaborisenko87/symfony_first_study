@@ -1,49 +1,22 @@
 <?php
 
-namespace App\Controller;
+namespace App\Controller\Admin\Superadmin;
 
+use App\Controller\Admin\MainController;
 use App\Entity\Category;
-use App\Entity\Video;
 use App\Form\CategoryType;
 use App\Utils\CategoryTreeAdminList;
 use App\Utils\CategoryTreeAdminOptionList;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Security\Core\Security;
 
-/**
- * @Route ("/admin")
- */
-class AdminController extends AbstractController
+class CategoriesController extends MainController
 {
     /**
-     * @var Security
-     */
-    private $security;
-
-    public function __construct(Security $security)
-    {
-        if (!$security->isGranted('IS_AUTHENTICATED_FULLY')) {
-            return $this->redirectToRoute('login');
-        }
-        $this->security = $security;
-    }
-    /**
-     * @Route("/", name="main_admin_page")
-     */
-    public function index(): Response
-    {
-        return $this->render('admin/index.html.twig', [
-            'controller_name' => 'AdminController',
-        ]);
-    }
-
-    /**
-     * @Route("/su/categories", name="categories_admin_page", methods={"GET", "POST"})
+     * @Route("/admin/su/categories", name="categories_admin_page", methods={"GET", "POST"})
      */
     public function categories(CategoryTreeAdminList $categories,
                                Request $request,
@@ -66,7 +39,7 @@ class AdminController extends AbstractController
     }
 
     /**
-     * @Route("/su/edit_category/{id}", name="edit_category_admin_page", methods={"GET", "POST"})
+     * @Route("/admin/su/edit_category/{id}", name="edit_category_admin_page", methods={"GET", "POST"})
      */
     public function editCategory(Category $category,
                                  Request $request,
@@ -86,7 +59,7 @@ class AdminController extends AbstractController
     }
 
     /**
-     * @Route("/su/delete_category/{id}", name="delete_category_admin_page")
+     * @Route("/admin/su/delete_category/{id}", name="delete_category_admin_page")
      */
     public function deleteCategory(Category $category, EntityManagerInterface $entityManager): RedirectResponse
     {
@@ -96,36 +69,6 @@ class AdminController extends AbstractController
         $entityManager->remove($category);
         $entityManager->flush();
         return $this->redirectToRoute('categories_admin_page');
-    }
-
-    /**
-     * @Route("/videos", name="videos_admin_page")
-     */
-    public function videos(EntityManagerInterface $entityManager): Response
-    {
-        if ($this->isGranted('ROLE_ADMIN')) {
-            $videos = $entityManager->getRepository(Video::class)->findAll();
-        } else {
-            $videos  = $this->getUser()->getLikedVideos();
-        }
-
-        return $this->render('admin/videos.html.twig', compact('videos'));
-    }
-
-    /**
-     * @Route("/su/upload-video", name="upload_video_admin_page")
-     */
-    public function upload_video(): Response
-    {
-        return $this->render('admin/upload_video.html.twig');
-    }
-
-    /**
-     * @Route("/su/users", name="users_admin_page")
-     */
-    public function users(): Response
-    {
-        return $this->render('admin/users.html.twig');
     }
 
     public function getAllCategories(CategoryTreeAdminOptionList $categories, $editedCategory = null): Response
@@ -150,4 +93,5 @@ class AdminController extends AbstractController
         }
         return false;
     }
+
 }
