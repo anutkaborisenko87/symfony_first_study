@@ -15,7 +15,7 @@ class Subscription
     private static $planDataPrices = [
         'free' => 0,
         'pro' => 15,
-        'enterprises' => 29
+        'enterprise' => 29
     ];
     /**
      * @ORM\Id
