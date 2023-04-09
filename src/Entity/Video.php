@@ -16,7 +16,7 @@ use Doctrine\ORM\Mapping\Index as Index;
 class Video
 {
     const VimeoPath = 'https://player.vimeo.com/video/';
-    const videoForNotLoggedIn = 113716040;
+    const videoForNotLoggedInOrNoMembers = 113716040;
     const perPage = 5;
     /**
      * @ORM\Id
@@ -116,7 +116,7 @@ class Video
         if ($user) {
             return $this->path;
         }
-        return self::VimeoPath.self::videoForNotLoggedIn;
+        return self::VimeoPath.self::videoForNotLoggedInOrNoMembers;
     }
 
     public function getCategory(): ?Category

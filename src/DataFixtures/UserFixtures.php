@@ -33,7 +33,7 @@ class UserFixtures extends Fixture
         $manager->flush();
     }
 
-    private function getUserData()
+    private function getUserData(): array
     {
         return [
           ['Admin', 'Default', 'admin@example.ua', 'symfony_admin', 'hjd8dehdh', ['ROLE_ADMIN']],
