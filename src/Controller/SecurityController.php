@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Subscription;
 use App\Entity\User;
 use App\Form\UserType;
 use Doctrine\ORM\EntityManagerInterface;
@@ -9,21 +10,28 @@ use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
-use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
 class SecurityController extends AbstractController
 {
 
     /**
-     * @Route ("/register", name="register")
+     * @Route ("/register/{plan}", name="register")
      */
     public function register(Request $request,
                              EntityManagerInterface $entityManager,
-                             UserPasswordEncoderInterface $password_encoder)
+                             UserPasswordHasherInterface $password_encoder,
+                             SessionInterface $session, $plan
+    )
     {
+        if ($request->isMethod('GET')) {
+            $session->set('planName', $plan);
+            $session->set('planPrice', Subscription::getPlanDataPriceByIndex($plan));
+        }
         $user = new User();
         $form = $this->createForm(UserType::class, $user);
         $form->handleRequest($request);
@@ -33,7 +41,7 @@ class SecurityController extends AbstractController
             $user->setName($request->request->get('user')['name']);
             $user->setLastName($request->request->get('user')['last_name']);
             $user->setEmail($request->request->get('user')['email']);
-            $password = $password_encoder->encodePassword($user, $request->request->get('user')['password']['first']);
+            $password = $password_encoder->hashPassword($user, $request->request->get('user')['password']['first']);
             $user->setPassword($password);
             $entityManager->persist($user);
             $entityManager->flush();
