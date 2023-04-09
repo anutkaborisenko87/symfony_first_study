@@ -7,6 +7,7 @@ use App\Entity\Video;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Security;
@@ -46,7 +47,7 @@ class MainController extends AbstractController
     /**
      * @Route ("/admin/cancel_plan", name="cancel_plan")
      */
-    public function cancelPlan(EntityManagerInterface $entityManager)
+    public function cancelPlan(EntityManagerInterface $entityManager): RedirectResponse
     {
         $user = $entityManager->getRepository(User::class)->find($this->getUser());
         $subscription = $user->getSubscription();

@@ -2,9 +2,11 @@
 
 namespace App\Controller;
 
+use App\Controller\Traits\SaveSubscription;
 use App\Entity\Subscription;
 use App\Entity\User;
 use App\Form\UserType;
+use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -18,6 +20,7 @@ use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
 class SecurityController extends AbstractController
 {
+    use SaveSubscription;
 
     /**
      * @Route ("/register/{plan}", name="register")
@@ -43,14 +46,20 @@ class SecurityController extends AbstractController
             $user->setEmail($request->request->get('user')['email']);
             $password = $password_encoder->hashPassword($user, $request->request->get('user')['password']['first']);
             $user->setPassword($password);
-            $entityManager->persist($user);
-            $entityManager->flush();
+            $user->setRoles(['ROLE_USER']);
+            $this->saveSubscription($plan, $user, $entityManager);
             $this->loginUserAutomatically($user, $password);
             return $this->redirectToRoute('main_admin_page');
         } elseif ($request->isMethod('post')) {
             $is_invalid = 'is-invalid';
         }
         $form = $form->createView();
+        if ($this->isGranted('IS_AUTHENTICATED_REMEMBERED') && $plan === Subscription::getPlanDataNameByIndex(0)) {
+            $this->saveSubscription($plan, $this->getUser(), $entityManager);
+            return $this->redirectToRoute('main_admin_page');
+        } elseif ($this->isGranted('IS_AUTHENTICATED_REMEMBERED')) {
+            return $this->redirectToRoute('payment');
+        }
         return $this->render('front/register.html.twig', compact('form', 'is_invalid'));
     }
 

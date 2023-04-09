@@ -74,14 +74,6 @@ class FrontController extends AbstractController
         return $this->render('front/search_results.html.twig', compact('videos', 'query', 'video_no_members'));
     }
 
-    /**
-     * @Route ("/payment", name="payment")
-     */
-    public function payment(): Response
-    {
-        return $this->render('front/payment.html.twig');
-    }
-
     public function mainCategories(EntityManagerInterface $entityManager): Response
     {
         $categories = $entityManager->getRepository(Category::class)->findBy(["parent" => null], ["name" => 'ASC']);
