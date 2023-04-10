@@ -4,7 +4,6 @@ namespace App\Tests\Controllers\Front;
 
 use Generator;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 
 class FrontControllerSecurityTest extends WebTestCase
 {
