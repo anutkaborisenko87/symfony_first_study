@@ -3,7 +3,7 @@
 {% block title %}My profile{% endblock %}
 
 {% block main %}
-    <h2>My profile <small><a onclick="return confirm('Are you sure?');" href="#">delete account</a></small></h2>
+    <h2>My profile <small><a onclick="return confirm('Are you sure?');" href="{{ path('delete_account') }}">delete account</a></small></h2>
     {% if not is_granted('ROLE_ADMIN') and subscription and subscription.getPlan in subscription.getPlanDataNames %}
         <p class="text-left">My plan - {{ subscription.getPlan|upper }}. <b>valid
                 to:</b> {{ subscription.validTo|date('Y-m-d') }}
