@@ -4,14 +4,20 @@ namespace App\Controller\Admin;
 
 use App\Entity\User;
 use App\Entity\Video;
+use App\Form\UserType;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Security;
+use Symfony\Component\HttpFoundation\Request;
 
+/**
+ * @Route ("/admin")
+ */
 class MainController extends AbstractController
 {
     /**
@@ -24,15 +30,37 @@ class MainController extends AbstractController
         $this->security = $security;
     }
     /**
-     * @Route("/admin", name="main_admin_page")
+     * @Route("/", name="main_admin_page")
      */
-    public function index(): Response
+    public function index(Request $request, UserPasswordHasherInterface $password_encoder, EntityManagerInterface $entityManager): Response
     {
+        $user = $entityManager->getRepository(User::class)->find($this->getUser());
+        $form = $this->createForm(UserType::class, $user, compact('user'));
+        $form->handleRequest($request);
+        $is_invalid = null;
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $user->setName($request->request->get('user')['name']);
+            $user->setLastName($request->request->get('user')['last_name']);
+            $user->setEmail($request->request->get('user')['email']);
+
+            $password = $password_encoder->hashPassword($user, $request->request->get('user')['password']['first']);
+            $user->setPassword($password);
+            $entityManager->persist($user);
+            $entityManager->flush();
+            $this->addFlash(
+                'success',
+                'Your changes were saved!'
+            );
+        } elseif ($request->isMethod('post')) {
+            $is_invalid = 'is-invalid';
+        }
+        $form = $form->createView();
         $subscription = $this->getUser()->getSubscription();
-        return $this->render('admin/my_profile.html.twig', compact('subscription'));
+        return $this->render('admin/my_profile.html.twig', compact('subscription', 'form', 'is_invalid'));
     }
     /**
-     * @Route("/admin/videos", name="videos_admin_page")
+     * @Route("/videos", name="videos_admin_page")
      */
     public function videos(EntityManagerInterface $entityManager): Response
     {
@@ -45,7 +73,7 @@ class MainController extends AbstractController
         return $this->render('admin/videos.html.twig', compact('videos'));
     }
     /**
-     * @Route ("/admin/cancel_plan", name="cancel_plan")
+     * @Route ("/cancel_plan", name="cancel_plan")
      */
     public function cancelPlan(EntityManagerInterface $entityManager): RedirectResponse
     {
@@ -61,10 +89,10 @@ class MainController extends AbstractController
     }
 
     /**
-     * @Route ("/admin/delete_account", name="delete_account")
+     * @Route ("/delete_account", name="delete_account")
      */
 
-    public function deleteAccount(EntityManagerInterface $entityManager)
+    public function deleteAccount(EntityManagerInterface $entityManager): RedirectResponse
     {
         $user = $entityManager->getRepository(User::class)->find($this->getUser());
         $entityManager->remove($user);

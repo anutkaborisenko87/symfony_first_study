@@ -2,16 +2,27 @@
 
 namespace App\Controller\Admin\Superadmin;
 
-use App\Controller\Admin\MainController;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Security;
 
-
-class SuperAdminController extends MainController
+/**
+ * @Route ("/admin/su")
+ */
+class SuperAdminController extends AbstractController
 {
     /**
-     * @Route("admin/su/upload-video", name="upload_video_admin_page")
+     * @var Security
+     */
+    protected $security;
+
+    public function __construct(Security $security)
+    {
+        $this->security = $security;
+    }
+    /**
+     * @Route("/upload-video", name="upload_video_admin_page")
      */
     public function upload_video()
     {
@@ -22,7 +33,7 @@ class SuperAdminController extends MainController
     }
 
     /**
-     * @Route("admin/su/users", name="users_admin_page")
+     * @Route("/users", name="users_admin_page")
      */
     public function users()
     {

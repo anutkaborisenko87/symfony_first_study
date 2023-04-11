@@ -2,7 +2,7 @@
 
 namespace App\Controller\Admin\Superadmin;
 
-use App\Controller\Admin\MainController;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use App\Entity\Category;
 use App\Form\CategoryType;
 use App\Utils\CategoryTreeAdminList;
@@ -12,11 +12,25 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Core\Security;
 
-class CategoriesController extends MainController
+/**
+ * @Route ("/admin/su")
+ */
+class CategoriesController extends AbstractController
 {
     /**
-     * @Route("/admin/su/categories", name="categories_admin_page", methods={"GET", "POST"})
+     *
+     * @var Security
+     */
+    protected $security;
+
+    public function __construct(Security $security)
+    {
+        $this->security = $security;
+    }
+    /**
+     * @Route("/categories", name="categories_admin_page", methods={"GET", "POST"})
      */
     public function categories(CategoryTreeAdminList $categories,
                                Request $request,
@@ -39,7 +53,7 @@ class CategoriesController extends MainController
     }
 
     /**
-     * @Route("/admin/su/edit_category/{id}", name="edit_category_admin_page", methods={"GET", "POST"})
+     * @Route("/edit_category/{id}", name="edit_category_admin_page", methods={"GET", "POST"})
      */
     public function editCategory(Category $category,
                                  Request $request,
@@ -59,7 +73,7 @@ class CategoriesController extends MainController
     }
 
     /**
-     * @Route("/admin/su/delete_category/{id}", name="delete_category_admin_page")
+     * @Route("/delete_category/{id}", name="delete_category_admin_page")
      */
     public function deleteCategory(Category $category, EntityManagerInterface $entityManager): RedirectResponse
     {

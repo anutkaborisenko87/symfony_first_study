@@ -3,6 +3,13 @@
 {% block title %}My profile{% endblock %}
 
 {% block main %}
+    {% for label, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="alert alert-{{label}}" role="alert">
+                {{message}}
+            </div>
+        {% endfor %}
+    {% endfor %}
     <h2>My profile <small><a onclick="return confirm('Are you sure?');" href="{{ path('delete_account') }}">delete account</a></small></h2>
     {% if not is_granted('ROLE_ADMIN') and subscription and subscription.getPlan in subscription.getPlanDataNames %}
         <p class="text-left">My plan - {{ subscription.getPlan|upper }}. <b>valid
@@ -22,53 +29,39 @@
             <a href="{{ path('payment') }}"> Get plan</a>
         </p>
     {% endif %}
-    <form class="mt-5" method="POST" action="#">
+    {{ form_start(form, {'attr': {'novalidate':'novalidate'}}) }}
         {% if is_granted('ROLE_ADMIN') %}
             <div class="form-group">
-                <label for="vimeoapikey">Vimeo API key</label>
-                <input required type="text" class="form-control is-invalid" id="vimeoapikey"
-                       placeholder="Enter api key">
-                <div class="invalid-feedback">
-                    Please provide api key
-                </div>
+                <label for="user_vimeo_api_key">Vimeo API key</label>
+                {{ form_widget(form.vimeo_api_key, {'attr': {'class': 'form-control ' ~ is_invalid, 'placeholder':"Vimeo API key name" }}) }}
+                <div class="invalid-feedback">{{ form_errors(form.vimeo_api_key)}}</div>
             </div>
         {% endif %}
         <div class="form-group">
-            <label for="name">Name</label>
-            <input required type="text" class="form-control is-invalid" id="name" placeholder="Your name">
-            <div class="invalid-feedback">
-                Please provide your name
-            </div>
+            <label for="user_name">Name</label>
+            {{ form_widget(form.name, {'attr': {'class': 'form-control ' ~ is_invalid, 'placeholder':"Enter new name" }}) }}
+            <div class="invalid-feedback">{{ form_errors(form.name) }}</div>
         </div>
         <div class="form-group">
-            <label for="lastname">Last name</label>
-            <input required type="text" class="form-control is-invalid" id="lastname" placeholder="Your last name">
-            <div class="invalid-feedback">
-                Please provide your last name
-            </div>
+            <label for="user_last_name">Last name</label>
+            {{ form_widget(form.last_name, {'attr': {'class': 'form-control ' ~ is_invalid, 'placeholder':"Enter new last name" }}) }}
+            <div class="invalid-feedback">{{ form_errors(form.last_name) }}</div>
         </div>
         <div class="form-group">
-            <label for="email">Email address</label>
-            <input required type="email" class="form-control is-invalid" id="email" placeholder="Enter email">
-            <div class="invalid-feedback">
-                Please provide valid email address
-            </div>
+            <label for="user_email">Email address</label>
+            {{ form_widget(form.email, {'attr': {'class': 'form-control ' ~ is_invalid, 'placeholder':"Enter new email" }}) }}
+            <div class="invalid-feedback">{{ form_errors(form.email) }}</div>
         </div>
         <div class="form-group">
-            <label for="password">Password</label>
-            <input required type="password" class="form-control is-invalid" id="password" placeholder="Password">
-            <div class="invalid-feedback">
-                Please provide password (min. 6 characters)
-            </div>
+            <label for="user_password_first">Password</label>
+            {{ form_widget(form.password.first, {'attr': {'class': 'form-control ' ~ is_invalid, 'placeholder':"Enter new password" }}) }}
+            <div class="invalid-feedback">{{ form_errors(form.password.first) }}</div>
         </div>
         <div class="form-group">
-            <label for="password_confirmation">Confirm password</label>
-            <input required type="password" class="form-control is-invalid" id="password_confirmation"
-                   placeholder="Confirm password">
-            <div class="invalid-feedback">
-                Please provide valid password confirmation
-            </div>
+            <label for="user_password_second">Confirm password</label>
+            {{ form_widget(form.password.second, {'attr': {'class': 'form-control ' ~ is_invalid, 'placeholder':"Confirm new password" }}) }}
+            <div class="invalid-feedback">{{ form_errors(form.password.second) }}</div>
         </div>
         <button type="submit" class="btn btn-primary">Save</button>
-    </form>
+    {{ form_end(form) }}
 {% endblock %}
