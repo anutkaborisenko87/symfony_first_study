@@ -10,7 +10,7 @@
 {% block main %}
     <h2>Categories list</h2>
         {{ categoriesList|raw }}
-    {{ form_start(form, {'attr': {'novalidate':'novalidate'}}) }}
+    {{ form_start(form) }}
         <div class="col-md-4 mb-3">
             <label for="validationServer01">Add new category</label>
                 {{ form_widget(form.name, {'attr': {'class': 'form-control ' ~ is_invalid, 'placeholder':"Category name" }, 'id':'validationServer01'}) }}

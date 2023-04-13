@@ -1,7 +1,16 @@
 twig:
     default_path: '%kernel.project_dir%/templates'
+    strict_variables: true
+    globals:
+        upload_route_name: "upload_video_locally_admin_page"
 
 
 when@test:
     twig:
-        strict_variables: true
+        globals:
+            upload_route_name: "upload_video_locally_admin_page"
+
+when@prod:
+    twig:
+        globals:
+            upload_route_name: "upload_video_admin_page"

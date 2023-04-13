@@ -1,7 +1,7 @@
 {% extends 'admin/base_admin.html.twig' %}
 {% block main %}
 <h2>Editing category</h2>
-    {{ form_start(form, {'attr': {'novalidate':'novalidate'}}) }}
+    {{ form_start(form) }}
         {{ form_widget(form.name, {'attr': {'class': 'form-control ' ~ is_invalid, 'placeholder':"Category name", 'value':category.name }, 'id':'validationServer01'}) }}
         <br>
         <label for="inlineFormCustomSelect">Parent:</label>

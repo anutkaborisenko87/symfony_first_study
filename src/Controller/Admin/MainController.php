@@ -5,6 +5,7 @@ namespace App\Controller\Admin;
 use App\Entity\User;
 use App\Entity\Video;
 use App\Form\UserType;
+use App\Utils\CategoryTreeAdminOptionList;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -62,15 +63,18 @@ class MainController extends AbstractController
     /**
      * @Route("/videos", name="videos_admin_page")
      */
-    public function videos(EntityManagerInterface $entityManager): Response
+    public function videos(EntityManagerInterface $entityManager, CategoryTreeAdminOptionList $categories): Response
     {
         if ($this->isGranted('ROLE_ADMIN')) {
-            $videos = $entityManager->getRepository(Video::class)->findAll();
+            $catArr = $categories->buildTree();
+            $categories = $categories->getCategoryList($catArr);
+            $videos = $entityManager->getRepository(Video::class)->findBy([], ['title' => 'ASC']);
         } else {
             $videos  = $this->getUser()->getLikedVideos();
         }
+        dump($categories);
 
-        return $this->render('admin/videos.html.twig', compact('videos'));
+        return $this->render('admin/videos.html.twig', compact('videos', 'categories'));
     }
     /**
      * @Route ("/cancel_plan", name="cancel_plan")
