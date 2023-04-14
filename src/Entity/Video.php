@@ -17,7 +17,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 class Video
 {
     const VimeoPath = 'https://player.vimeo.com/video/';
-    const videoForNotLoggedInOrNoMembers = 113716040;
+    const videoForNotLoggedInOrNoMembers = 'https://player.vimeo.com/video/113716040';
     const perPage = 5;
     const uploadFolder = '/uploads/videos/';
     /**
@@ -119,12 +119,13 @@ class Video
         return $this;
     }
 
-    public function vimeoid($user): string
+    public function vimeoid(): string
     {
-        if ($user) {
+        if (strpos($this->path, self::uploadFolder) !== false) {
             return $this->path;
         }
-        return self::VimeoPath.self::videoForNotLoggedInOrNoMembers;
+        $array = explode('/', $this->path);
+        return end($array);
     }
 
     public function getCategory(): ?Category
