@@ -72,8 +72,6 @@ class MainController extends AbstractController
         } else {
             $videos  = $this->getUser()->getLikedVideos();
         }
-        dump($categories);
-
         return $this->render('admin/videos.html.twig', compact('videos', 'categories'));
     }
     /**
@@ -104,4 +102,5 @@ class MainController extends AbstractController
         session_destroy();
         return $this->redirectToRoute('main_page');
     }
+
 }

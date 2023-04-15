@@ -41,7 +41,7 @@
                             </select>
                         </form>
                     </td>
-                    <td><a href="{{path('delete_video',{'video':video.id, 'path':video.vimeoId(app.user)}) }}" onclick="delete_video(event);"><i class="fas fa-trash"></i></a></td>
+                    <td><a href="{{path('delete_video',{'video':video.id}) }}" onclick="delete_video(event);"><i class="fas fa-trash"></i></a></td>
                 {% endif %}
             </tr>
             {% endfor %}

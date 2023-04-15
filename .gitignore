@@ -22,3 +22,4 @@
 /phpunit.xml.dist
 /tests.sh
 .idea/
+/public/uploads/

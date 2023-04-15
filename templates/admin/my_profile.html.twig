@@ -22,37 +22,37 @@
             <a href="{{ path('payment') }}"> Get plan</a>
         </p>
     {% endif %}
-    {{ form_start(form, {'attr': {'novalidate':'novalidate'}}) }}
+    {{ form_start(form) }}
         {% if is_granted('ROLE_ADMIN') %}
             <div class="form-group">
                 <label for="user_vimeo_api_key">Vimeo API key</label>
-                {{ form_widget(form.vimeo_api_key, {'attr': {'class': 'form-control ' ~ is_invalid, 'placeholder':"Vimeo API key name" }}) }}
+                {{ form_widget(form.vimeo_api_key, {'attr': {'class': 'form-control ' ~ is_invalid, 'required':'required', 'placeholder':"Vimeo API key name" }}) }}
                 <div class="invalid-feedback">{{ form_errors(form.vimeo_api_key)}}</div>
             </div>
         {% endif %}
         <div class="form-group">
             <label for="user_name">Name</label>
-            {{ form_widget(form.name, {'attr': {'class': 'form-control ' ~ is_invalid, 'placeholder':"Enter new name" }}) }}
+            {{ form_widget(form.name, {'attr': {'class': 'form-control ' ~ is_invalid, 'required':'required', 'placeholder':"Enter new name" }}) }}
             <div class="invalid-feedback">{{ form_errors(form.name) }}</div>
         </div>
         <div class="form-group">
             <label for="user_last_name">Last name</label>
-            {{ form_widget(form.last_name, {'attr': {'class': 'form-control ' ~ is_invalid, 'placeholder':"Enter new last name" }}) }}
+            {{ form_widget(form.last_name, {'attr': {'class': 'form-control ' ~ is_invalid, 'required':'required', 'placeholder':"Enter new last name" }}) }}
             <div class="invalid-feedback">{{ form_errors(form.last_name) }}</div>
         </div>
         <div class="form-group">
             <label for="user_email">Email address</label>
-            {{ form_widget(form.email, {'attr': {'class': 'form-control ' ~ is_invalid, 'placeholder':"Enter new email" }}) }}
+            {{ form_widget(form.email, {'attr': {'class': 'form-control ' ~ is_invalid, 'required':'required', 'placeholder':"Enter new email" }}) }}
             <div class="invalid-feedback">{{ form_errors(form.email) }}</div>
         </div>
         <div class="form-group">
             <label for="user_password_first">Password</label>
-            {{ form_widget(form.password.first, {'attr': {'class': 'form-control ' ~ is_invalid, 'placeholder':"Enter new password" }}) }}
+            {{ form_widget(form.password.first, {'attr': {'class': 'form-control ' ~ is_invalid, 'required':'required', 'placeholder':"Enter new password" }}) }}
             <div class="invalid-feedback">{{ form_errors(form.password.first) }}</div>
         </div>
         <div class="form-group">
             <label for="user_password_second">Confirm password</label>
-            {{ form_widget(form.password.second, {'attr': {'class': 'form-control ' ~ is_invalid, 'placeholder':"Confirm new password" }}) }}
+            {{ form_widget(form.password.second, {'attr': {'class': 'form-control ' ~ is_invalid, 'required':'required', 'placeholder':"Confirm new password" }}) }}
             <div class="invalid-feedback">{{ form_errors(form.password.second) }}</div>
         </div>
         <button type="submit" class="btn btn-primary">Save</button>

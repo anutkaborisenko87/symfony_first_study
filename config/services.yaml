@@ -21,7 +21,6 @@ services:
             - '../src/DependencyInjection/'
             - '../src/Entity/'
             - '../src/Kernel.php'
-
     App\Utils\LocalUploader:
         arguments:
             $targetDirectory: '%videos_directory%'

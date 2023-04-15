@@ -37,7 +37,7 @@ class UserFixtures extends Fixture
     private function getUserData(): array
     {
         return [
-          ['Admin', 'Default', 'admin@example.ua', 'symfony_admin', 'hjd8dehdh', ['ROLE_ADMIN']],
+          ['Admin', 'Default', 'admin@example.ua', 'symfony_admin', 'b2a2f1fea131f7c4f1ec5bae1e1dbf01', ['ROLE_ADMIN']],
           ['Anna', 'DefUser', 'anna@default.ua', 'symfony_anna_def', null, ['ROLE_USER']],
           ['Anna', 'SecondDefUser', 'anna_2user@default.ua', 'symfony_anna2user_def', null, ['ROLE_USER']]
         ];

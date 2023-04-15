@@ -9,6 +9,7 @@ use App\Form\VideoType;
 use App\Repository\UserRepository;
 use App\Utils\Inertfaces\UploaderInterface;
 use App\Utils\LocalUploader;
+use App\Utils\VimeoUploader;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
@@ -71,7 +72,7 @@ class SuperAdminController extends AbstractController
     /**
      * @Route("/users", name="users_admin_page")
      */
-    public function users(EntityManagerInterface $entityManager, UserRepository $userRepository)
+    public function users(UserRepository $userRepository)
     {
         if (!$this->security->isGranted('ROLE_ADMIN')) {
             return $this->redirectToRoute('main_admin_page');
@@ -98,11 +99,15 @@ class SuperAdminController extends AbstractController
      * @Route("/delete-video/{video}", name="delete_video")
      */
 
-    public function deleteVideo(Video $video, UploaderInterface $fileUploader, EntityManagerInterface $entityManager): RedirectResponse
+    public function deleteVideo(Video $video, VimeoUploader $vimeoUploader, LocalUploader $localUploader, EntityManagerInterface $entityManager): RedirectResponse
     {
         $path = $video->getPath();
         $entityManager->remove($video);
         $entityManager->flush();
+        $fileUploader = $vimeoUploader;
+        if (strpos($path, Video::uploadFolder) !== false) {
+            $fileUploader = $localUploader;
+        }
         if ($fileUploader->delete($path)) {
             $this->addFlash('success', 'The video was successfully deleted');
         } else {
@@ -121,6 +126,22 @@ class SuperAdminController extends AbstractController
         $entityManager->persist($video);
         $entityManager->flush();
         return $this->redirectToRoute('videos_admin_page');
+    }
+    /**
+     * @Route ("/upload-video-by-vimeo", name="upload_video_by_vimeo")
+     */
+    public function uploadVideoByVimeo(Request $request, EntityManagerInterface $entityManager)
+    {
+        $vimeo_id = preg_replace('/^\/.+\//', '', $request->get('video_uri'));
+        if ($request->get('videoName') && $vimeo_id) {
+            $video = new Video();
+            $video->setTitle($request->get('videoName'));
+            $video->setPath(Video::VimeoPath.$vimeo_id);
+            $entityManager->persist($video);
+            $entityManager->flush();
+            return $this->redirectToRoute('videos_admin_page');
+        }
+        return $this->render('admin/upload_video.html.twig');
     }
 
 }
