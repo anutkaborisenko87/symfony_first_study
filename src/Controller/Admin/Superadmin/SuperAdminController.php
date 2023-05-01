@@ -14,6 +14,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Security;
 
@@ -142,6 +143,49 @@ class SuperAdminController extends AbstractController
             return $this->redirectToRoute('videos_admin_page');
         }
         return $this->render('admin/upload_video.html.twig');
+    }
+
+    /**
+     * @Route ("/set-video-duration/{video}/{vimeo_id}", name="set_video_duration")
+     */
+    public function setVideoDuration(Video $video, $vimeo_id, EntityManagerInterface $entityManager): RedirectResponse
+    {
+        if (!is_numeric($vimeo_id)) {
+            return $this->redirectToRoute('videos_admin_page');
+        }
+        $user_vimeo_token = $this->getUser()->getVimeoApiTokenKey();
+        $curl = curl_init();
+        curl_setopt_array($curl, array(
+            CURLOPT_URL => "https://api.vimeo.com/videos/{$vimeo_id}",
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => "",
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 30,
+            CURLOPT_CUSTOMREQUEST => "GET",
+            CURLOPT_HTTPHEADER => array(
+                "Accept: application/vmd.vimeo.*+json;version=3.4",
+                "Authorization: Bearer $user_vimeo_token",
+                "Cache-Control: no-cache",
+                "Content-type: application/x-www-form-urlencoded"
+            ),
+        ));
+        $response = curl_exec($curl);
+        $err = curl_error($curl);
+
+        curl_close($curl);
+        if ($err) {
+            throw new ServiceUnavailableHttpException('Error. Try again latter. Message: '.$err);
+        } else {
+            $duration = json_decode($response, true)['duration']/60;
+            if ($duration) {
+                $video->setDuration($duration);
+                $entityManager->persist($video);
+                $entityManager->flush();
+            } else {
+                $this->addFlash('danger', 'We are not able to update duration. Check the video');
+            }
+         return $this->redirectToRoute('videos_admin_page');
+        }
     }
 
 }

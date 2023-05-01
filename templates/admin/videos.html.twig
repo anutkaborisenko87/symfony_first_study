@@ -41,7 +41,12 @@
                             </select>
                         </form>
                     </td>
-                    <td><a href="{{path('delete_video',{'video':video.id}) }}" onclick="delete_video(event);"><i class="fas fa-trash"></i></a></td>
+                    <td>
+                        <a href="{{path('delete_video',{'video':video.id}) }}" onclick="delete_video(event);"><i class="fas fa-trash"></i></a>
+                        {% if is_granted('ROLE_ADMIN') and video.duration is null %}
+                            <a href="{{  path('set_video_duration', {'video':video.id, 'vimeo_id':video.vimeoId}) }}">set duration</a>
+                        {% endif %}
+                    </td>
                 {% endif %}
             </tr>
             {% endfor %}
