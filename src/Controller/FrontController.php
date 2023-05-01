@@ -10,12 +10,14 @@ use App\Repository\VideoRepository;
 use App\Utils\CategoryTreeFrontPage;
 use App\Utils\VideoForNotValidSubscription;
 use Doctrine\ORM\EntityManagerInterface;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+
 class FrontController extends AbstractController
 {
     use Likes;
@@ -126,5 +128,16 @@ class FrontController extends AbstractController
         return $this->json(['action' => $result, 'id'=>$video->getId()]);
     }
 
+    /**
+     * @Route("/dalete-comment/{comment}", name="delete_comment")
+     * @Security ("user.getId() == comment.getUser().getId()")
+     */
+    public function deleteComment(Comment $comment, Request $request, EntityManagerInterface $entityManager): RedirectResponse
+    {
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+        $entityManager->remove($comment);
+        $entityManager->flush();
+        return $this->redirect($request->headers->get('referer'));
+    }
 
 }
