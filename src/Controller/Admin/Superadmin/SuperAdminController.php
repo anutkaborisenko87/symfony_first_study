@@ -64,6 +64,7 @@ class SuperAdminController extends AbstractController
             $video->setTitle($fileName[1]);
             $entityManager->persist($video);
             $entityManager->flush();
+
             return $this->redirectToRoute('videos_admin_page');
         }
         $form = $form->createView();
@@ -146,17 +147,18 @@ class SuperAdminController extends AbstractController
     }
 
     /**
-     * @Route ("/set-video-duration/{video}/{vimeo_id}", name="set_video_duration")
+     * @Route ("/set-video-duration/{video}", name="set_video_duration")
      */
-    public function setVideoDuration(Video $video, $vimeo_id, EntityManagerInterface $entityManager): RedirectResponse
+    public function setVideoDuration(Video $video, EntityManagerInterface $entityManager): RedirectResponse
     {
-        if (!is_numeric($vimeo_id)) {
+
+        if (!is_numeric($video->vimeoid())) {
             return $this->redirectToRoute('videos_admin_page');
         }
         $user_vimeo_token = $this->getUser()->getVimeoApiTokenKey();
         $curl = curl_init();
         curl_setopt_array($curl, array(
-            CURLOPT_URL => "https://api.vimeo.com/videos/{$vimeo_id}",
+            CURLOPT_URL => "https://api.vimeo.com/videos/{$video->vimeoid()}",
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => "",
             CURLOPT_MAXREDIRS => 10,
